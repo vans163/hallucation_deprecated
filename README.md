@@ -1,9 +1,7 @@
 ## hallucation
 <img src="http://i.imgur.com/iTk2iiL.png" />
 
-## <img src="http://i.imgur.com/cNoYlvo.png" width="25%" height="25%" /> Experimental
-
-## R19.1+ Only
+## <img src="http://i.imgur.com/cNoYlvo.png" width="250" height="250" /> Experimental
 
 ## Description
 
