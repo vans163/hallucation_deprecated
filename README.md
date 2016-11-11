@@ -5,14 +5,9 @@
 
 ## Description
 
-hallucation is a one way state differential for reactive clients.  
-State flows from your data, to hallucation, to your front end. 
-It cannot flow the other way.  
+hallucation is a one way state differential for reactive clients. State flows from your data, to hallucation, to your front end. It cannot flow the other way.  
   
-hallucation is meant to solve the problem of complexity in state management.  
-  
-hallucation does this by removing the need for a Request/Response based interface,
-instead you only send Request and the Response comes in the form of a state differential.
+hallucation does this by removing the need for a Request/Response based interface, instead you only send Request and the Response comes in the form of a state differential.  
 
 ## How to use hallucation
 
