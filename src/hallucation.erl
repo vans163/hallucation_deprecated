@@ -7,7 +7,7 @@
 
 behaviour_info(callbacks) ->
     [{init, 1}, {state_changed, 4}, {handle_info, 2}];
-behavior_info(_) ->
+behaviour_info(_) ->
     undefined.
 
 callback_mode() ->  handle_event_function.
@@ -19,7 +19,7 @@ start(HallucationMod, Params) -> start(HallucationMod, Params, start).
 start_link(HallucationMod, Params) -> start(HallucationMod, Params, start_link).
 
 start(HallucationMod, Params, StartAtom) ->
-    {InitialState, InitialPrivState} = erlang:apply(HallucationMod, init, Params),
+    {InitialState, InitialPrivState} = erlang:apply(HallucationMod, init, [Params]),
     case verify_state(InitialState) of
         {error, Err} -> {error, Err};
         ok -> erlang:apply(gen_statem, StartAtom, [
@@ -42,7 +42,7 @@ init({HallucationMod, InitialState, InitialPrivState}) ->
             state=> InitialState,
             state_hash=> erlang:phash2(InitialState)
         },
-        1 %timeout immediately?
+        0
     }.
 
 handle_event(info, Term, initialized, D) ->
@@ -71,13 +71,14 @@ handle_event(info, Term, initialized, D) ->
                         state=> NewState, 
                         state_hash=> NewStateHash
                         }, 
+%TODO: FIX THIS, this will never proc if we get updates every < 200ms
                     200}
             end
     end,
 
     case Timeout of
         ignore -> {next_state, initialized, D2};
-        Time -> {next_state, initialized, D2, Time};
+        Time -> {next_state, initialized, D2, Time}
     end;
 
 handle_event(timeout, _, initialized, D) ->
@@ -104,44 +105,45 @@ handle_event(timeout, _, initialized, D) ->
 %  Internal Functions
 % ====================
 
-
-diff(Old, New) when Old =:= New ->
-    no_diff;
-
-diff(Old, New) when is_map(Old) ->
+diff_state(Old, New) when Old =:= New -> #{};
+diff_state(Old, New) when is_map(Old), is_map(New) == false -> New;
+diff_state(Old, New) when is_map(Old) ->
     OldKeys = maps:keys(Old),
     NewKeys = maps:keys(New),
-    lists:foldl(fun(Key, Acc) ->
+
+    OldMinusNew = OldKeys -- NewKeys,
+    Map1 = lists:foldl(fun(Key, Acc) ->
+            Acc#{Key=> 'zxcye23_delete_4334de'}
+        end, #{}, OldMinusNew 
+    ),
+
+    NewMinusOld = NewKeys -- OldKeys,
+    Map2 = lists:foldl(fun(Key, Acc) ->
+            Acc#{Key=> maps:get(Key, New)}
+        end, #{}, NewMinusOld 
+    ),
+
+    RemainingKeys = NewKeys -- NewMinusOld,
+    Map3 = lists:foldl(fun(Key, Acc) ->
             OldVal = maps:get(Key, Old),
             NewVal = maps:get(Key, New),
             case OldVal =:= NewVal of
                 true -> Acc;
                 false ->
-                    Acc#{ Key=> Diff(OldVal, NewVal) }
+                    Acc#{ Key=> diff_state(OldVal, NewVal) }
             end
-        end, #{}, OldKeys
-    );
+        end, #{}, RemainingKeys
+    ),
+    maps:merge(maps:merge(Map1, Map2), Map3);
 
-diff(Old, New) when Old =/= New ->
-    New.
-
-
+diff_state(Old, New) when Old =/= New -> New.
 
 
-
-
-
-
-is_diff(OldVal, NewVal) when OldVal /:= NewVal ->  
-
-diff_state(OldState, State) -> diff_state(OldState, State, []). 
-diff_state(OldState, State, DiffList) ->
-    
-    .
 
 verify_state(State) when is_atom(State) -> ok;
 verify_state(State) when is_binary(State) -> ok;
 verify_state(State) when is_integer(State) -> ok;
+verify_state(State) when is_float(State) -> ok;
 
 verify_state(State) when is_map(State) -> 
     try
@@ -156,6 +158,3 @@ verify_state(State) when is_map(State) ->
     end;
 
 verify_state(State) -> {error, {state_invalid_type, State}}.
-
-
-    

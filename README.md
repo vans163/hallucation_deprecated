@@ -1,9 +1,9 @@
 ## hallucation
 <img src="http://i.imgur.com/iTk2iiL.png" />
 
-## <img src="http://i.imgur.com/cNoYlvo.png" /> Lab Grade
+## <img src="http://i.imgur.com/cNoYlvo.png" width="25%" height="25%" /> Experimental
 
-## R19.1 Only
+## R19.1+ Only
 
 ## Description
 
@@ -35,6 +35,12 @@ NOTE:
 Every state is hashed with erlang:phash2/1, this makes it possible to restart
 a session from a disconnection.
 
+## Limitations
+
+Erlang R19.1+  
+State MUST be a Map  
+State can only contain types atom, integer, float, binary and map  
+
 ## Example
 
 You have a module 'ws_api_actions' which has functions like update_email/1.  
@@ -56,7 +62,6 @@ Your hallucation behavior can now look like
 
 
 ```erlang
-Params = WSPid,
 hallucation:start(example_hallucation, {WSPid, uuid_1234})
 
 
