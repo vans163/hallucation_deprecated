@@ -61,6 +61,7 @@ hallucation:start(example_hallucation, {WSPid, uuid_1234})
 -module(example_hallucation).
 -behavior(hallucation).
 
+-export([init/1, state_changed/4, handle_info/2]).
 
 init({WSPid, Uuid}) ->
     add_mnesia_subscription(user),
@@ -72,18 +73,6 @@ state_changed(NewStateHash, NewState, Diff, PrivState) ->
     WSPid = maps:get(wspid, PrivState),
     stargate_plugin:ws_send(WSPid, {text, jsx:encode(#{hash=>NewStateHash, diff=>Diff})}).
 
-
-
-% =================
-% Private Functions
-% =================
-
-add_mnesia_subscription(Table) -> 
-    {ok, _} = mnesia:subscribe({table, Table, detailed}).
-
-initial_state(Uuid) ->
-    [User] = mnesia:dirty_read({user, Uuid}),
-    #{user=> #{email=> User#user.email}}.
 
 %Updated user
 handle_info({delete, user, What, _, _}, {State, PrivState}) ->
@@ -106,4 +95,16 @@ handle_info({write, user, NewRecord, [OldRecord], _}, {State, PrivState}) ->
     {state_update, NewState, PrivState};
 
 handle_info(Term, {State, PrivState}) -> {ok, PrivState}.
+
+
+% =================
+% Private Functions
+% =================
+
+add_mnesia_subscription(Table) -> 
+    {ok, _} = mnesia:subscribe({table, Table, detailed}).
+
+initial_state(Uuid) ->
+    [User] = mnesia:dirty_read({user, Uuid}),
+    #{user=> #{email=> User#user.email}}.
 ```
