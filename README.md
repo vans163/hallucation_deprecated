@@ -18,11 +18,11 @@ Some questions around how to receive one time events arise, as well as the possi
 
 ## How hallucation works
 
-Uses gen_statem under the hood  
-Start off with an initial state  
-Subscribe/+Expose functions that mutate state  
-Every 200ms OldState and NewState produce diff  
-Your backend now decides how to send this diff to peer  
+- Uses gen_statem under the hood  
+- Start off with an initial state  
+- Subscribe/+Expose functions that mutate state  
+- Every 200ms OldState and NewState produce diff  
+- Your backend now decides how to send this diff to peer  
 
 NOTE:  
 Every state is hashed with erlang:phash2/1, this makes it possible to restart
