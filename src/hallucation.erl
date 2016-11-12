@@ -15,35 +15,34 @@ callback_mode() ->  handle_event_function.
 terminate(_R, _S, _D) -> ok.
 code_change(_V, S, D, _E) -> {ok, S, D}.
 
-start(HallucationMod, Params) -> start(HallucationMod, Params, start).
-start_link(HallucationMod, Params) -> start(HallucationMod, Params, start_link).
+start(HallucationMod, Params) -> gen_statem:start(?MODULE, {HallucationMod, Params}, []).
+start_link(HallucationMod, Params) -> gen_statem:start_link(?MODULE, {HallucationMod, Params}, []).
 
-start(HallucationMod, Params, StartAtom) ->
-    {InitialState, InitialPrivState} = erlang:apply(HallucationMod, init, [Params]),
-    case verify_state(InitialState) of
-        {error, Err} -> {error, Err};
-        ok -> erlang:apply(gen_statem, StartAtom, [
-            ?MODULE, {HallucationMod, InitialState, InitialPrivState}, []]
-        )
-    end.
-
-init({HallucationMod, InitialState, InitialPrivState}) ->
+init({HallucationMod, Params}) ->
     process_flag(trap_exit, true),
 
-    {ok, 
-        initialized,
-        #{  
-            hallu_mod=> HallucationMod, 
-            pstate=> InitialPrivState, 
+    {InitialState, InitialPrivState} = erlang:apply(HallucationMod, init, [Params]),
+    case verify_state(InitialState) of
+        {error, Err} -> 
+            {stop, {error, Err}};
+        ok -> 
+            {ok, 
+                initialized,
+                #{  
+                    hallu_mod=> HallucationMod, 
+                    pstate=> InitialPrivState, 
 
-            old_state=> undefined,
-            old_state_hash=> undefined,
+                    old_state=> undefined,
+                    old_state_hash=> undefined,
 
-            state=> InitialState,
-            state_hash=> erlang:phash2(InitialState)
-        },
-        0
-    }.
+                    state=> InitialState,
+                    state_hash=> erlang:phash2(InitialState)
+                },
+                0
+            }
+    end.
+
+
 
 handle_event(info, Term, initialized, D) ->
     Mod = maps:get(hallu_mod, D),
