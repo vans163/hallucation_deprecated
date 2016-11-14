@@ -70,14 +70,14 @@ handle_event(info, Term, initialized, D) ->
                         state=> NewState, 
                         state_hash=> NewStateHash
                         }, 
-%TODO: FIX THIS, this will never proc if we get updates every < 200ms
-                    200}
+%TODO: FIX THIS, this will never proc if we get updates every < 50ms
+                    50}
             end
     end,
 
     case Timeout of
-        ignore -> {next_state, initialized, D2};
-        Time -> {next_state, initialized, D2, Time}
+        ignore -> {next_state, initialized, D2, 50};
+        Time -> {next_state, initialized, D2, 50}
     end;
 
 handle_event(timeout, _, initialized, D) ->
