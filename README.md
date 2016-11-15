@@ -32,7 +32,8 @@ a session from a disconnection.
 
 Erlang R19.1+  
 State MUST be a Map  
-State can only contain types atom, integer, float, binary and map  
+State can only contain types atom, integer, float, binary, map and list  
+State can contain list but it will not be diffed  
 
 ## Example
 

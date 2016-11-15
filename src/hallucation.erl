@@ -144,6 +144,9 @@ verify_state(State) when is_binary(State) -> ok;
 verify_state(State) when is_integer(State) -> ok;
 verify_state(State) when is_float(State) -> ok;
 
+%TODO: Support differential
+verify_state(State) when is_list(State) -> ok;
+
 verify_state(State) when is_map(State) -> 
     try
         lists:foreach(fun(Key) ->
